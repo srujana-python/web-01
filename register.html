@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+.input-container {
+  display: -ms-flexbox; /* IE10 */
+  display: flex;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.icon {
+  padding: 10px;
+  background: dodgerblue;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  outline: none;
+}
+
+.input-field:focus {
+  border: 2px solid dodgerblue;
+}
+
+/* Set a style for the submit button */
+.btn {
+  background-color: dodgerblue;
+  color: white;
+  padding: 15px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+.btn:hover {
+  opacity: 1;
+}
+</style>
+<html>
+<body>
+    
+    <h2>Register here</h2>
+
+    <form action="{{ url_for("register_action") }}"  method="post" style="max-width:500px;margin:auto">
+      <div class="input-container">
+      <i class="fa fa-user icon"></i>
+        <label for="inputName" class="sr-only">Username</label>
+        <input type="name" name="username" id="inputName" class="form-control" placeholder="Username" required autofocus></div><br>
+        <div class="input-container">
+        <i class="fa fa-key icon"></i>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required></div><br>
+        <div class="input-container">
+        <i class="fa fa-envelope icon"></i>
+        <label for="Emailid" class="sr-only">Email-id</label>
+        <input type="emailid" name="email" id="inputemail" class="form-control" placeholder="Emailid" required></div><br>
+        <div class="input-container">
+        <i class="fa fa-phone icon"></i>
+        <label for="phone" class="sr-only">phone</label>
+        <input type="number" name="phone" id="inputphone" class="form-control" placeholder="phone" required></div><br>
+        <button type="submit" class="btn">register</button>
+      </form>
+
+    
+</body>
+</html>
