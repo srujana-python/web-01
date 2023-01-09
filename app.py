@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for, flash
+from flask import Flask, render_template,request,redirect,url_for, flash, session
  # For flask implementation
 from pymongo import MongoClient # Database connector
 from bson.objectid import ObjectId # For ObjectId to work
@@ -35,14 +35,21 @@ def redirect_url():# return back to index page
 @app.route("/list")
 def lists ():
 	#Display the all Tasks
-	todos_l = todos.find()
+	print("iiiiiiiii")
+	print(session["ID"])
+	print(ObjectId(session["ID"]))
+	todos_l = todos.find({"createdBy":ObjectId(session["ID"])})
+	print(todos_l)
+	# for i in todos_l:
+	# 	print(i)
+	
 	#a1="active"
 	return render_template('index.html',todos=todos_l,t=title,h=heading)
 	
 
 @app.route("/")
 def login():
-
+	#Display the Uncompleted Tasks
 	return render_template('login.html')
 
 @app.route('/login_action', methods =["GET", "POST"])
@@ -53,11 +60,17 @@ def login_action():
    print(uname)
    print(pwd)
    login = users.find_one({"username":uname,"password":pwd})
+   print("***********")
+ 
    if login:
+	   id=str(login["_id"])
+	   print(id)
+	   session["ID"]=id
+	   print(session["ID"])
 	   return redirect("/list")
    else:
-	   return render_template('login_error.html')
-	  
+	   return render_template("login_error.html")
+
 @app.route('/register_action', methods =["GET", "POST"])
 def register_action():
    print("hello")
@@ -65,11 +78,7 @@ def register_action():
    pwd = request.form['password'] 
    email = request.form['email'] 
    phone = request.form['phone'] 
-   print(uname)
-   print(pwd)
-   print(phone)
-   print(email)
-
+  
    query=users.find_one({"username":uname})
    if query:
 	    return render_template('register_error.html')
@@ -101,16 +110,16 @@ def register_login():
 @app.route("/uncompleted")
 def tasks ():
 	#Display the Uncompleted Tasks
-	todos_l = todos.find({"done":"no"})
-	a2="active"
-	return render_template('index.html',a2=a2,todos=todos_l,t=title,h=heading)
+	todos_l = todos.find({"done":"no","createdBy":ObjectId(session["ID"])})
+	#a2="active"
+	return render_template('index.html',todos=todos_l,t=title,h=heading)
 
 
 @app.route("/completed")
 def completed ():
 	#Display the Completed Tasks
 	print(completed)
-	todos_l = todos.find({"done":"yes"})
+	todos_l = todos.find({"done":"yes","createdBy":ObjectId(session["ID"])})
 	#a3="active"
 	return render_template('index.html',todos=todos_l,t=title,h=heading)
 
@@ -137,7 +146,17 @@ def action ():
 	desc=request.values.get("desc")
 	date=request.values.get("date")
 	pr=request.values.get("pr")
-	todos.insert_one({ "name":name, "desc":desc, "date":date, "pr":pr, "done":"no"})
+	todos.insert_one(
+		{
+			 "name":name, 
+			 "desc":desc, 
+			 "date":date, 
+			 "pr":pr, 
+			 "done":"no",
+			 "createdBy":ObjectId(session["ID"]),
+			 "createdOn":datetime.now(),
+			 "updatedOn":datetime.now(),
+			 })
 	return redirect("/list")
 
 @app.route("/remove")
@@ -161,7 +180,15 @@ def action3 ():
 	date=request.values.get("date")
 	pr=request.values.get("pr")
 	id=request.values.get("_id")
-	todos.update_one({"_id":ObjectId(id)}, {'$set':{ "name":name, "desc":desc, "date":date, "pr":pr }})
+	todos.update_one({"_id":ObjectId(id)}, 
+	{
+		'$set':{ "name":name, 
+				 "desc":desc, 
+				 "date":date, 
+				 "pr":pr ,
+				 "updatedOn":datetime.now(),
+				 }
+	})
 	return redirect("/")
 
 @app.route("/search", methods=['GET'])
@@ -192,4 +219,3 @@ if __name__ == "__main__":
 	debug = False if env == 'production' else True
 	app.run(debug=True)
 	#app.run(port=port, debug=debug)
-
